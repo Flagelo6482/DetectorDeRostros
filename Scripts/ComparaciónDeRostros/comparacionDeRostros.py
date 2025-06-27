@@ -25,8 +25,10 @@ def comparar_rostros(
 
     Returns:
         Dict: {
-            'matches_found': bool,  # True si al menos una coincidencia
-            'matches': List[Dict],  # Lista ordenada de coincidencias
+            'matches_found': bool,  # True si al menos una coincidencia, si la lista no esta vacia osea es mayor a 0,
+            encontro almenos una coincidencia que supero el umbral, es false si no se encontro ninguna coincidencia
+            'matches': List[Dict],  # Lista ordenada de coincidencias que superaron el umbral(o las top_n mejores si se
+            especifico)
             'query_embedding': np.ndarray  # Embedding de consulta (opcional)
         }
     """
@@ -39,7 +41,7 @@ def comparar_rostros(
             matches.append({
                 'face_id': face_id,
                 'similarity': similarity,
-                'metadata': data  # Incluye rutas de imágenes, etc.
+                'metadata': data  # Diccionario que Incluye toda la información relevante del rostro(embedding, ruta, ruta del corte)
             })
 
     # Ordenar coincidencias por similitud (de mayor a menor)

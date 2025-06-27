@@ -3,7 +3,7 @@ from ModeloParaDetección.inicioDeModelo import inicializar_modelo
 from CargarEmbeddings.cargaDeEmbeddings import cargar_embeddings_db
 from ExtraerEmbeddings.extraerEmbeddingImgNueva import extraer_embedding
 from ComparaciónDeRostros.comparacionDeRostros import comparar_rostros
-from DetecciónDeRostros.Scripts.MostrarCoincidencias.mejorComparacionDeUnaImagen import mejor_comparacion
+from MostrarCoincidencias.mejorComparacionDeUnaImagen import mejor_comparacion
 
 import os
 import numpy as np
