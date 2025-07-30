@@ -1,5 +1,8 @@
 # dashboard_ui.py
 import tkinter as tk
+from tkinter import filedialog
+from PIL import Image, ImageTk
+from click import command
 
 
 # Convertimos la función en una clase que HEREDA de tk.Frame
@@ -12,8 +15,10 @@ class DashboardScreen(tk.Frame):
         """
         # 1. Llamamos al constructor de la clase padre (tk.Frame)
         super().__init__(master, bg="#202060")
-
         self.on_logout_callback = on_logout_callback
+        # Variable para seleccionar una imagen al buscar con el boton "upload_button"
+        self.selected_image = None
+        self.image_path = ""
 
         # 2. Toda la lógica de la UI ahora se construye sobre 'self' (el Frame)
         # en lugar de sobre una nueva 'window'.
@@ -85,9 +90,19 @@ class DashboardScreen(tk.Frame):
         # --- 2.2. Panel Derecho ---
         right_panel_frame = tk.Frame(main_content_frame, bg="lightgray", bd=2, relief="solid")
         right_panel_frame.grid(row=0, column=1, padx=(10, 0), sticky="nsew")
-        original_image_area = tk.Label(right_panel_frame, text="[Área de Imagen Original]", bg="lightgray", fg="gray",
-                                       relief="sunken", bd=1)
-        original_image_area.pack(pady=20, padx=20, fill=tk.BOTH, expand=True)
+
+        #CORECCION!!
+        #Desactivamos la propagación del frame derecho, para evitar que se ajuste al tamaño de sus hijos
+        right_panel_frame.pack_propagate(False)
+
+
+        # Cambiamos a un Label que podremos actualizar
+        self.original_image_area = tk.Label(right_panel_frame, text="[Área de Imagen Original]", bg="lightgray",
+                                            fg="gray",
+                                            relief="sunken", bd=1)
+        #Importante: aca no usamos "True" para que el label no fuerce el tamaño
+        self.original_image_area.pack(pady=20, padx=20, fill=tk.BOTH, expand=True)
+
         # Etiqueta "Imagen original"
         original_label = tk.Label(right_panel_frame, text="Imagen original",
                                   font=("Arial", 12, "bold"), bg="lightgray")
@@ -95,8 +110,53 @@ class DashboardScreen(tk.Frame):
 
         # Botón "Subir Imagen"
         upload_button = tk.Button(right_panel_frame, text="Subir Imagen",
-                                  font=("Arial", 10), bg="white", fg="black", padx=15, pady=8)
+                                  font=("Arial", 10), bg="white", fg="black", padx=15, pady=8,
+                                  command=self.upload_image)
+        #Boton "Busqueda de coincidencias"
+        search_button = tk.Button(right_panel_frame, text="Buscar coincidencias",
+                                  font=("Arial", 10), bg="white", fg="black", padx=15, pady=8,
+                                  command=self.upload_image)
+
         upload_button.pack(pady=(0, 20))
 
-        # 3. YA NO HAY window.mainloop() AQUÍ.
+    def upload_image(self):
+        """Abre el explorador de archivos para seleccionar una imagen y la muestra"""
+        # Abrir el explorador de archivos
+        file_path = filedialog.askopenfilename(
+            title="Seleccionar imagen",
+            filetypes=[("Imágenes", "*.jpg *.jpeg *.png *.bmp *.gif"), ("Todos los archivos", "*.*")]
+        )
+
+        if file_path:  # Si se seleccionó un archivo
+            self.image_path = file_path  # Guardamos la ruta
+
+            try:
+                # Abrir la imagen con PIL
+                image = Image.open(file_path)
+
+                # ### PASO 2: REDIMENSIONAR DINÁMICAMENTE ###
+                # Obtenemos el tamaño actual del Label donde irá la imagen.
+                # 'update_idletasks' asegura que las dimensiones estén calculadas.
+                self.original_image_area.update_idletasks()
+                width = self.original_image_area.winfo_width()
+                height = self.original_image_area.winfo_height()
+
+                # Usamos el tamaño del Label como el tamaño máximo para la imagen.
+                max_size = (width, height)
+                image.thumbnail(max_size, Image.LANCZOS)
+
+                # Convertir para tkinter
+                self.selected_image = ImageTk.PhotoImage(image)
+
+                # Mostrar la imagen en el área correspondiente
+                self.original_image_area.config(image=self.selected_image, text="")
+                self.original_image_area.image = self.selected_image  # Mantener referencia
+
+            except Exception as e:
+                print(f"Error al cargar la imagen: {e}")
+                self.original_image_area.config(text="Error al cargar la imagen", image=None)
+
+
+
+        # 3. YA NO HAY window.mainloop()     AQUÍ.
         # El control lo tiene el script principal.

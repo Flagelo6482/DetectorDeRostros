@@ -1,14 +1,16 @@
 # main.py
 import tkinter as tk
-from Login_ui_demo import LoginScreen
-from Dash_ui_demo import DashboardScreen
+from .Login_ui_demo import LoginScreen
+from .Dash_ui_demo import DashboardScreen
 
 
 class MainApplication:
-    def __init__(self, master):
+    def __init__(self, master, modelo, db):
         # "master" es la ventana principal (el objeto tk.Tk()).
         # La guardamos en self.master para poder usarla en toda la clase.
         self.master = master
+        self.modelo = modelo
+        self.db = db
 
         # ---- Configuración de la Ventana Principal ----
         master.title("Detector de Ratas_v0")

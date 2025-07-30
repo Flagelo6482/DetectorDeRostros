@@ -47,7 +47,7 @@ class LoginScreen(tk.Frame):
         usuario = self.username_entry.get()
         contrasena = self.password_entry.get()
 
-        if usuario == "frank" and contrasena == "JCVH454":
+        if usuario == "1" and contrasena == "1":
             messagebox.showinfo("Autenticación exitosa", "¡Bienvenido!")
             # Notificamos al script principal que el login fue exitoso
             self.on_login_success()
