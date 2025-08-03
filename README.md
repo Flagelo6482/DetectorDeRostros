@@ -83,7 +83,7 @@
 ## ✉️ Contacto
 📧 Correo: jesusc6482@gmail.com
 
-🔗 LinkedIn: Francisco Jesús (Frank) Sono Callla
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/francisco-jes%C3%BAs-sono-callla-820a6526a/)
 
 [![Contactar por WhatsApp](https://img.shields.io/badge/WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white)](https://wa.me/51929226405?text=Hola%20Estoy%20interesado%20en%20tu%20proyecto%20Ars%20Facialis%20en%20GitHub) 
 
