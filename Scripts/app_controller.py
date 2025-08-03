@@ -6,25 +6,19 @@ from guardar_dash import SaveScreen
 
 class MainApplication:
     def __init__(self, master, funciones, recursos):
-        self.master = master  # Ventana de tkinter
-        self.funciones = funciones  # Diccionari de las funciones que tenemos
-        self.recursos = recursos  # Diccionario de lo recursos que pasamos como el modelo y base de datos
+        self.master = master
+        self.funciones = funciones
+        self.recursos = recursos
 
-        # Configuramos la interfaz con la ventana que en este caso es "master"
-        # master.title("Detector de Rostros v1.0")
         master.configure(bg="#0c0c2b")
         master.state('zoomed')
 
-        # ---- Creación del "Escenario" ----
-        # Un Frame contenedor para intercambiar las diferentes pantallas.
         self.container = tk.Frame(master)
         self.container.pack(fill="both", expand=True)
 
-        # --- Registramos pantallas ---
-        self._registrar_pantallas()  # <- Aquí se crean TODAS las pantallas con sus parámetros
-        self.mostrar_pantalla("login")  # <- Solo se activa la pantalla de login
+        self._registrar_pantallas()
+        self.mostrar_pantalla("login")
 
-    # --- Funcion para registrar las pantallas ---
     def _registrar_pantallas(self):
         """Registra todas las pantallas disponibles."""
         self.pantallas = {
@@ -32,7 +26,7 @@ class MainApplication:
                 self.container,
                 self.funciones,
                 self.recursos,
-                self.mostrar_pantalla,  # << Único callback necesario
+                self.mostrar_pantalla,
                 self.master
             ),
             "detectar": DetectScreen(
@@ -51,7 +45,6 @@ class MainApplication:
             )
         }
 
-    # --- FUNCION PARA MOSTRAR LA PRIMERA PANTALLA QUE ES "Login ---
     def mostrar_pantalla(self, nombre_pantalla):
         """Muestra la pantalla especificada y oculta la actual."""
         if hasattr(self, 'pantalla_actual'):
@@ -59,3 +52,8 @@ class MainApplication:
 
         self.pantalla_actual = self.pantallas[nombre_pantalla]
         self.pantalla_actual.pack(fill="both", expand=True)
+
+        if hasattr(self.pantalla_actual, 'display_title'):
+            self.master.title(self.pantalla_actual.display_title)
+        else:
+            self.master.title("Aplicación de Detección")

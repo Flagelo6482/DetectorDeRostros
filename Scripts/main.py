@@ -1,69 +1,37 @@
 import tkinter as tk
-import glob
 import os
 import numpy as np
 from insightface.app import FaceAnalysis
 from typing import Dict
 
 from app_controller import MainApplication
-from face_logic import comparar_rostros,detectorDeRostros_lote, extraer_embedding, mostrar_coincidencias
+from face_logic import comparar_rostros, detectorDeRostros_lote, extraer_embedding, mostrar_coincidencias
 
 if __name__ == "__main__":
-    #Inicimos el modelo preentrenado
-    """
-    1.PRIMER PASO INICIAMOS EL MODELO QUE USAREMOS PARA LA COMPARACIÓN DE ROSTROS
-    -FaceAnalysis:De insightface que usamos es un conjunto de modelos preentrenados de machine learning(redes neuronales profundas)
-                  especializados en analisis facial
-    -buffalo_l: Pack preentrenado que detecta los rostros, puntos faciales como ojo, nariz, boca, etc; genera vectores 
-                numericos(embeddings) que representan rostros
-    -CPUExecutionProvider: Indica que los calculos se haran en el CPU(no GPU por que no contamos con tarjeta grafica :p)
-    """
     def inicializar_modelo():
         """Inicializa y devuelve el modelo de InsightFace"""
         model = FaceAnalysis(name="buffalo_l", providers=['CPUExecutionProvider'])
         model.prepare(ctx_id=0, det_size=(320, 320))
         return model
 
-    #Iniciamos la base de datos
     def cargar_embeddings_db(db_root: str = "../outputs/") -> Dict[str, Dict]:
         """
-        Carga todos los embeddings y metadatos de la base de datos
-
-        Args:
-            db_root: Directorio raíz con subcarpetas embeddings/, rostros/, resultados/
-
-        Returns:
-            Diccionario con {face_id: {embedding, face_image, result_image}}
+        Carga todos los embeddings y metadatos de la base de datos.
         """
-        # Rutas establecidas dentro de la carpeta "/outputs/"
         embeddings_dir = os.path.join(db_root, "embeddings")
         faces_dir = os.path.join(db_root, "rostros")
         results_dir = os.path.join(db_root, "resultados")
 
-        """
-        db: diccionario vacio
-        Iteramos en la ruta "embeddings_dir" los archivos de embeddings guardados con NumPy
-        face_id: Extramos un nombre del archivo
-        """
         db = {}
+        # Cargamos los archivos .npy
         for emb_file in os.listdir(embeddings_dir):
             if emb_file.endswith('.npy'):
                 face_id = os.path.splitext(emb_file)[0].split('_')[-1]
                 emb_path = os.path.join(embeddings_dir, emb_file)
 
-                """
-                Guardamos los rostros en "rostro-face_img_path" en "faces_dir"
-                Guardamos los resultados de "result_img_path" en "results_dir"
-                """
                 face_img_path = os.path.join(faces_dir, f"rostro_{face_id}.jpg")
                 result_img_path = os.path.join(results_dir, f"detectados_{face_id}.jpg")
 
-                """
-                Agregamos al diccionario "db" una entrada con "face_id" como clave y con el contenido
-                El "embedding" cargado
-                La ruta hacia la imagen del ROSTRO
-                La ruta a la imagen de RESULTADOS
-                """
                 db[face_id] = {
                     'embedding': np.load(emb_path),
                     'face_image': face_img_path if os.path.exists(face_img_path) else None,
@@ -71,26 +39,31 @@ if __name__ == "__main__":
                 }
         return db
 
-
+    # Inicializamos el modelo y la base de datos una sola vez
     modelo = inicializar_modelo()
     db = cargar_embeddings_db()
 
-    #Iniciamos la interfaz
-    root = tk.Tk()
-
-    #Llamamos a la interfaz padre que se encarga de las otras pantallas
-    app = MainApplication(root, funciones={
-        'comparar': lambda emb: comparar_rostros(db, emb),
-        # 'detectar': detectorDeRostros_lote,
-        'extraer': lambda img_path: extraer_embedding(modelo, img_path),
-        # 'mostrar': mostrar_coincidencias
-    },
-    recursos={
+    # Preparamos los diccionarios de recursos y funciones para la aplicación
+    recursos = {
         'modelo': modelo,
         'db': db
-    })
+    }
 
+    funciones = {
+        'detector_lote': detectorDeRostros_lote,
+        'mostrar_coincidencias': mostrar_coincidencias,
+        'extraer_embedding': extraer_embedding,
+        'comparar_rostros': comparar_rostros
+        # Las funciones de 'extraer' y 'comparar' ya no se pasan aquí,
+        # ya que se importan directamente en `detector_dash.py`.
+    }
+
+    # Iniciamos la interfaz
+    root = tk.Tk()
+    app = MainApplication(root, funciones, recursos)
     root.mainloop()
+
+
 
 
 

@@ -6,7 +6,7 @@ class LoginScreen(tk.Frame):
     def __init__(self, master, funciones, recursos, controlador, root_window):
         super().__init__(master)  # Inicializa tk.Frame
         self.root_window = root_window
-        self.root_window.title("Inicio de sesión")
+        self.display_title = "Inicio de Sesión"
         self.controlador = controlador
         self.funciones = funciones  # Diccionario de las funciones que tenemos
         self.recursos = recursos  # Diccionario de los recursos que pasamos como el modelo y base de datos
